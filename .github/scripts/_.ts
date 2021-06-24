@@ -22,6 +22,7 @@ const latest = maxSatisfying(
       /refs\/tags\/([^\n]*)/gi,
     )].map((_) => _[1]).filter((version) => valid(version)),
   ">= 0",
+  { includePrerelease: true },
 );
 if (!latest) {
   version = "0.1.0";
