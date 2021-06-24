@@ -1,0 +1,49 @@
+name: ci
+
+on: [push]
+
+jobs:
+  build:
+    name: Format, Lint and Test
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'WIP:')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Format
+        run: deno fmt --check
+
+      - name: Lint
+        run: deno lint
+
+      - name: Tests
+        run: deno test -A --allow-none
+      
+      - name: Release tag (if version bump).
+        id: do_tag
+        run: |
+          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          deno run -A --no-check -q .github/scripts/_.ts "${{ github.event.head_commit.message }}"
+          echo "::set-output name=version::$(echo "Deno.stdout.writeSync(new TextEncoder().encode(Deno.readTextFileSync('version.ts').trim().substring(16).slice(0, -2)))" | deno run -A -)"
+      
+      - name: Release binaries (if exists).
+        if: |
+          !startsWith(github.event.head_commit.message, 'WIP:') &&
+          hashFiles('dot-x86_64-unknown-linux-gnu.zip') != '' &&
+          hashFiles('dot-x86_64-pc-windows-msvc.zip') != '' &&
+          hashFiles('dot-x86_64-apple-darwin.zip') != '' &&
+          hashFiles('dot-aarch64-apple-darwin.zip') != ''
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            dot-x86_64-unknown-linux-gnu.zip
+            dot-x86_64-pc-windows-msvc.zip
+            dot-x86_64-apple-darwin.zip
+            dot-aarch64-apple-darwin.zip
+          draft: true
+          tag_name: ${{ steps.do_tag.outputs.version }}
