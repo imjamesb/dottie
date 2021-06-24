@@ -67,4 +67,6 @@ Deno.test("createFileObject('e3b...', 'text', 0)", () => {
   );
 });
 
-if (oldHome) Deno.test("Restore $HOME", () => Deno.env.set("HOME", oldHome));
+if (oldHome) {
+  Deno.test("Restore $HOME (util)", () => Deno.env.set("HOME", oldHome));
+}
