@@ -45,5 +45,5 @@ jobs:
             dot-x86_64-pc-windows-msvc.zip
             dot-x86_64-apple-darwin.zip
             dot-aarch64-apple-darwin.zip
-          draft: true
+          draft: false
           tag_name: ${{ steps.do_tag.outputs.version }}
