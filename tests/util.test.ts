@@ -6,6 +6,7 @@ import {
 } from "https://deno.land/std@0.99.0/testing/asserts.ts";
 import * as util from "../lib/util.ts";
 
+const oldHome = Deno.env.get("HOME");
 Deno.env.set("HOME", "/home");
 Deno.test("Gets correct home.", () =>
   assertStrictEquals(util.getHome(), "/home/"));
@@ -65,3 +66,5 @@ Deno.test("createFileObject('e3b...', 'text', 0)", () => {
     },
   );
 });
+
+if (oldHome) Deno.test("Restore $HOME", () => Deno.env.set("HOME", oldHome));
