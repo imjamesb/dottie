@@ -6,23 +6,6 @@ import {
 } from "https://deno.land/std@0.99.0/testing/asserts.ts";
 import * as util from "../lib/util.ts";
 
-const oldHome = Deno.env.get("HOME");
-Deno.env.set("HOME", "/home");
-Deno.test("Gets correct home.", () =>
-  assertStrictEquals(util.getHome(), "/home/"));
-
-Deno.test("pathToStore('/home/test')", () =>
-  assertStrictEquals(util.pathToStore("/home/test"), "~/test"));
-
-Deno.test("pathToStore('/not-home/test')", () =>
-  assertStrictEquals(util.pathToStore("/not-home/test"), "/not-home/test"));
-
-Deno.test("storeToPath('~/test')", () =>
-  assertStrictEquals(util.storeToPath("~/test"), "/home/test"));
-
-Deno.test("storeToPath('/not-home/test')", () =>
-  assertStrictEquals(util.storeToPath("/not-home/test"), "/not-home/test"));
-
 Deno.test("hash('text')", () =>
   assertStrictEquals(
     util.hash("text"),
