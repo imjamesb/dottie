@@ -15,4 +15,5 @@
 !/.gitignore
 !/cli.ts
 !/mod.ts
+!/README.md
 !/version.ts
