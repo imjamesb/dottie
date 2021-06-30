@@ -1,88 +1,64 @@
+#!/usr/bin/env -S deno run -A --no-check --unstable
 // Imports
-import { exists } from "https://deno.land/std@0.99.0/fs/exists.ts";
-import $ from "https://deno.land/x/cash@0.1.0-alpha.13/mod.ts";
+import $ from "https://deno.land/x/cash@0.1.0-alpha.14/mod.ts";
 import {
-  inc,
-  maxSatisfying,
-  valid,
-} from "https://deno.land/x/semver@v1.4.0/mod.ts";
+  getLatestVersion,
+  hasTags,
+  saveVersion,
+  upgradeVersion,
+} from "../util/util.ts";
+
+function error(message: string) {
+  throw new Error(message);
+}
 
 $.verbose = 4;
-$.env = Deno.env.toObject();
+$.env ??= Deno.env.toObject();
 
-let version!: string;
+const user = $.env.AUTH_USER ??= "x-access-token";
+const pass = $.env.AUTH_PASS ??= $.env.GITHUB_TOKEN;
+if (!pass) error("Missing AUTH_PASS or GITHUB_TOKEN!");
+const auth = `${user}:${pass}`;
+const repo = $.env.GITHUB_REPOSITORY;
+if (!repo) error("Missing GITHUB_REPOSITORY!");
+const remote = `https://${auth}@github.com/${repo}`;
+const msg = $.env.COMMIT_MESSAGE;
+if (!msg) Deno.exit(0);
 
-const secret = Deno.env.get("GITHUB_TOKEN");
-if (!secret) throw new Error("Missing github token!");
+$.secret(pass);
 
-const latest = maxSatisfying(
-  [...(await $
-    `git ls-remote -t https://x-access-token:${$.env.GITHUB_TOKEN}@github.com/${$.env.GITHUB_REPOSITORY}`
-    .stdout()).matchAll(
-      /refs\/tags\/([^\n]*)/gi,
-    )].map((_) => _[1]).filter((version) => valid(version)),
-  ">= 0",
-  { includePrerelease: true },
-);
-if (!latest) {
-  version = "0.1.0";
-  console.log("First time run!");
-  console.log(">", version);
+const latest = await getLatestVersion($, remote);
+const tags = hasTags(msg, "canary", "pre", "patch", "minor", "major");
+
+let newVersion = latest;
+
+if (tags.major) {
+  newVersion = upgradeVersion(
+    newVersion.version,
+    (tags.canary ? "pre" : "") + "major",
+  );
 }
-if (latest && !version) {
-  const msg = Deno.args[0];
-  if (!msg) {
-    console.log("No message with commit.");
-    Deno.exit(0);
-  }
-  const result = msg.match(/\#(pre|patch|minor|major)/i);
-  if (!result) {
-    console.log("Could not extract action from commit message.");
-    Deno.exit(0);
-  }
-  const newV = inc(latest!, (result[1].toLowerCase()) as "pre");
-  if (!newV) throw new Error("Could increment version!");
-  version = newV;
-  console.log("Incremented version!");
-  console.log(">", version);
+if (tags.minor) {
+  newVersion = upgradeVersion(
+    newVersion.version,
+    (tags.canary ? "pre" : "") + "minor",
+  );
 }
-
-if (!version) {
-  console.log("No new version!");
-  Deno.exit(0);
+if (tags.patch) {
+  newVersion = upgradeVersion(
+    newVersion.version,
+    (tags.canary ? "pre" : "") + "patch",
+  );
 }
-
-Deno.writeTextFileSync("version.ts", `export default "${version}";\n`);
-console.log("Written version.ts to", version);
-
-if (await exists(".git/hooks")) {
-  Deno.rename(".git/hooks", ".git/hooks-tmp");
+if ((tags.pre && !tags.canary)) {
+  newVersion = upgradeVersion(newVersion.version, "pre", false);
+} else if (tags.canary && latest === newVersion) {
+  newVersion = upgradeVersion(newVersion.version, "pre");
 }
 
-await $`git config user.name "${$.env.GITHUB_ACTOR}"`;
-// deno-fmt-ignore
-await $`git config user.email "${$.env.GITHUB_ACTOR}@users.noreply.github.com";`;
-await $`git add .;`;
-await $`git commit -m "Incremented version to ${version}";`;
-await $`git tag ${version};`;
-
-const targets = [
-  ["x86_64-unknown-linux-gnu", "dot-x86_64-unknown-linux-gnu"],
-  ["x86_64-pc-windows-msvc", "dot-x86_64-pc-windows-msvc.exe"],
-  ["x86_64-apple-darwin", "dot-x86_64-apple-darwin"],
-  ["aarch64-apple-darwin", "dot-aarch64-apple-darwin"],
-];
-
-for (const target of targets) {
-  // deno-fmt-ignore
-  await $`deno compile -o dot-${target[0]} --target ${target[0]} -A --no-check cli.ts`;
-  await $`zip dot-${target[0]} ${target[1]}`;
-}
-
-// deno-fmt-ignore
-await $`git remote set-url origin https://x-access-token:${$.env.GITHUB_TOKEN}@github.com/${$.env.GITHUB_REPOSITORY};`;
-await $`git push -u origin ${version};`;
-
-if (await exists(".git/hooks-tmp")) {
-  Deno.rename(".git/hooks-tmp", ".git/hooks");
+if (newVersion.version !== latest.version) {
+  await saveVersion($, newVersion.version, true, "./version.ts");
+  console.log("Upgraded from %s to %s", latest.version, newVersion.version);
+} else {
+  console.log("Same version, not updating!");
 }
