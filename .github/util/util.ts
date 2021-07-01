@@ -15,6 +15,7 @@ const svopts = {
 
 export function tagToSemver(tags: string): string | null {
   const parts: string[] = tags.split("/");
+  console.log(parts);
   if (parts.length == 3) {
     if (!(parts[1] = valid(parts[1])!)) {
       throw new Error("Invalid semver version!");
