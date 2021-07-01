@@ -76,8 +76,6 @@ if (newVersion.version !== latest.version) {
     versionsWithCanaries,
   );
   const latestVersion = await getLatestVersion($, remote, versions);
-  const currentBranch = (await $`git rev-parse --abbrev-ref HEAD`.stdout())
-    .trim();
   await $`mkdir -p .install-map`;
   $.cwd = $.cwd + "/.install-map";
   await $`git init`;
