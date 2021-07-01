@@ -85,18 +85,18 @@ if (newVersion.version !== latest.version) {
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
   await $`git checkout --orphan install-map`;
-  await Deno.writeTextFile("latest.txt", latestVersion.version);
+  await Deno.writeTextFile(".install-map/latest.txt", latestVersion.version);
   await Deno.writeTextFile(
-    "latest-canary.txt",
+    ".install-map/latest-canary.txt",
     latestVersionWithCanary.version,
   );
-  await Deno.writeTextFile("history.txt", versions.join("\n"));
+  await Deno.writeTextFile(".install-map/history.txt", versions.join("\n"));
   await Deno.writeTextFile(
-    "history-canary.txt",
+    ".install-map/history-canary.txt",
     versionsWithCanaries.join("\n"),
   );
   await Deno.writeTextFile(
-    ".gitignore",
+    ".install-map/.gitignore",
     [
       "*",
       "!/latest.txt",
