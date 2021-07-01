@@ -54,7 +54,7 @@ export async function getLatestVersion(
 }
 
 const _semverToTag1 = /^\d+\.\d+\.\d+$/g;
-const _semverToTag2 = /^\d+\.\d+\.\d+-canary\.\d+$/g;
+const _semverToTag2 = /^\d+\.\d+\.\d+\-canary\.\d+$/g;
 
 export function semverToTag(version: string): string {
   if (_semverToTag1.test(version)) {
