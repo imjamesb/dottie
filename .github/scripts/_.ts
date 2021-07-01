@@ -81,7 +81,7 @@ if (newVersion.version !== latest.version) {
   await $`mkdir -p .install-map`;
   $.cwd = $.cwd + "/.install-map";
   await $`git init`;
-  await $`git remote set-url origin ${remote}`;
+  await $`git remote add origin ${remote}`;
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
   await $`git checkout --orphan install-map`;
