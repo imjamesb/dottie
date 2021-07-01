@@ -117,7 +117,7 @@ async function saveVersionToFile(
 async function saveVersionToGit($: Cash, version: string, isSemver = true) {
   if (isSemver) version = semverToTag(version);
   if (!version) throw new Error("Invalid version!");
-  await $`ga version.ts`;
+  await $`git add version.ts`;
   await $`git commit -m "Updated version!"`;
   await $`git tag "${version}"`;
 }
