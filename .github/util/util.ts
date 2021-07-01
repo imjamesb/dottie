@@ -20,11 +20,11 @@ export function tagToSemver(tags: string): string | null {
     if (!(parts[1] = valid(parts[1])!)) {
       throw new Error("Invalid semver version!");
     }
-    if (tags[0] !== "canary") throw new Error("Invalid semver extension!");
-    if (!/^\d+$/g.test(tags[2])) {
+    if (parts[0] !== "canary") throw new Error("Invalid semver extension!");
+    if (!/^\d+$/g.test(parts[2])) {
       throw new Error("Invalid semver extension version!");
     }
-    return tags[1] + "-" + tags[0] + "." + tags[2];
+    return parts[1] + "-" + parts[0] + "." + parts[2];
   } else if (parts.length === 1) return parts[0];
   else throw new Error("Invalid tag!");
 }
