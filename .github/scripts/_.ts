@@ -109,7 +109,6 @@ if (newVersion.version !== latest.version) {
   await $`ls -la`;
   await $`git commit -m "Initialized install map."`;
   await $`git push -fu origin install-map`;
-  await $`git checkout ${currentBranch}`;
 
   if (await exists(".git/hooks-tmp")) {
     Deno.rename(".git/hooks-tmp", ".git/hooks");
