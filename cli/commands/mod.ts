@@ -1,5 +1,5 @@
 // Imports
-import { Command, HelpGenerator } from "../deps.ts";
+import { Command } from "../deps.ts";
 import version from "../../version.ts";
 import init from "./init.ts";
 
