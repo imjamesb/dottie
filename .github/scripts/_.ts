@@ -106,6 +106,7 @@ if (newVersion.version !== latest.version) {
     ].join("\n"),
   );
   await $`git add .`;
+  await $`ls -la`;
   await $`git commit -m "Initialized install map."`;
   await $`git push -fu origin install-map`;
   await $`git checkout ${currentBranch}`;
