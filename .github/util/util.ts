@@ -58,6 +58,7 @@ const _semverToTag2 = /^\d+\.\d+\.\d+\-canary\.\d+$/g;
 
 export function semverToTag(version: string): string {
   console.log(version);
+  version = version.trim();
   if (_semverToTag1.test(version)) {
     version = valid(version, svopts)!;
     if (!version) throw new Error("Invalid semver version " + version);
