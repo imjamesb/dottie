@@ -1,7 +1,9 @@
 #!/usr/bin/env -S deno run -A --no-check --unstable
 // Imports
+import { exists } from "https://deno.land/std@0.99.0/fs/exists.ts";
 import $ from "https://deno.land/x/cash@0.1.0-alpha.14/mod.ts";
 import {
+  generateBinaries,
   getLatestVersion,
   hasTags,
   saveVersion,
@@ -57,7 +59,15 @@ if ((tags.pre && !tags.canary)) {
 }
 
 if (newVersion.version !== latest.version) {
+  if (await exists(".git/hooks")) {
+    Deno.rename(".git/hooks", ".git/hooks-tmp");
+  }
+  await generateBinaries($);
+  await $`git remote set-url origin ${remote}`;
   await saveVersion($, newVersion.version, true, "./version.ts");
+  if (await exists(".git/hooks-tmp")) {
+    Deno.rename(".git/hooks-tmp", ".git/hooks");
+  }
   console.log("Upgraded from %s to %s", latest.version, newVersion.version);
 } else {
   console.log("Same version, not updating!");

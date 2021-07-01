@@ -26,8 +26,9 @@ jobs:
         id: do_tag
         run: |
           export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          deno run -A --no-check -q .github/scripts/_.ts "${{ github.event.head_commit.message }}"
-          echo "::set-output name=version::$(echo "Deno.stdout.writeSync(new TextEncoder().encode(Deno.readTextFileSync('version.ts').trim().substring(16).slice(0, -2)))" | deno run -A -)"
+          export COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          deno run -A --no-check -q .github/scripts/_.ts
+          echo "::set-output name=versionTag::$(.github/scripts/version.ts tag)"
       
       - name: Release binaries (if exists).
         if: |
@@ -46,4 +47,4 @@ jobs:
             dot-x86_64-apple-darwin.zip
             dot-aarch64-apple-darwin.zip
           draft: false
-          tag_name: ${{ steps.do_tag.outputs.version }}
+          tag_name: ${{ steps.do_tag.outputs.versionTag }}

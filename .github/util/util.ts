@@ -133,3 +133,19 @@ export async function saveVersion(
   if (isSemver) version = semverToTag(version);
   await $`git push -u origin "${version}"`;
 }
+
+export async function generateBinaries(
+  $: Cash,
+  targets: [target: string, executableName: string][] = [
+    ["x86_64-unknown-linux-gnu", "dot-x86_64-unknown-linux-gnu"],
+    ["x86_64-pc-windows-msvc", "dot-x86_64-pc-windows-msvc.exe"],
+    ["x86_64-apple-darwin", "dot-x86_64-apple-darwin"],
+    ["aarch64-apple-darwin", "dot-aarch64-apple-darwin"],
+  ],
+) {
+  for (const target of targets) {
+    // deno-fmt-ignore
+    await $`deno compile -o dot-${target[0]} --target ${target[0]} -A --no-check cli.ts`;
+    await $`zip dot-${target[0]} ${target[1]}`;
+  }
+}
