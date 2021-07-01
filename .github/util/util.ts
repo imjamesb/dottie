@@ -57,17 +57,20 @@ const _semverToTag1 = /^\d+\.\d+\.\d+$/g;
 const _semverToTag2 = /^\d+\.\d+\.\d+\-canary\.\d+$/g;
 
 export function semverToTag(version: string): string {
+  console.log(version);
   if (_semverToTag1.test(version)) {
     version = valid(version, svopts)!;
     if (!version) throw new Error("Invalid semver version " + version);
     return version;
   }
+  console.log("Did not pass 1");
   if (_semverToTag2.test(version)) {
     const v = valid(version.substring(0, version.indexOf("-")), svopts);
     if (!v) throw new Error("Invalid semver version " + version);
     return "canary/" + v + "/" +
       version.substring(version.lastIndexOf(".") + 1);
   }
+  console.log("Did not pass 2");
   throw new Error("Invalid semver version: " + version);
 }
 
