@@ -78,7 +78,7 @@ if (newVersion.version !== latest.version) {
   const latestVersion = await getLatestVersion($, remote, versions);
   const currentBranch = (await $`git rev-parse --abbrev-ref HEAD`.stdout())
     .trim();
-  await $`git fetch`;
+  await $`git fetch -f||true && git pull -f||true`;
   await $`git branch -d install-map || true`;
   await $`git checkout --orphan install-map`;
   await Deno.writeTextFile("latest.txt", latestVersion.version);
