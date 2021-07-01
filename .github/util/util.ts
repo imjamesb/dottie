@@ -128,6 +128,7 @@ export async function saveVersion(
   isSemver = true,
   path = "./version.ts",
 ) {
+  version = version.trim();
   await saveVersionToFile(version, isSemver, path);
   await saveVersionToGit($, version, isSemver);
   if (isSemver) version = semverToTag(version);
