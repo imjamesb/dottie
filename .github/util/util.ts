@@ -32,20 +32,28 @@ export function filterTagsToVersions(tags: string[]): string[] {
   return tags.filter((tag) => !!tag);
 }
 
-export async function getVersions($: Cash, remote: string): Promise<string[]> {
-  return semverSort(filterTagsToVersions(
+export async function getVersions(
+  $: Cash,
+  remote: string,
+  includeCanary = true,
+  lines?: string[],
+): Promise<string[]> {
+  lines ??= semverSort(filterTagsToVersions(
     (await $`git ls-remote -q --tags ${remote}`
       .stdout()).trim().replace(/\^\{\}/gi, "").substring(58)
       .split(/\r*\n+\w+\t\w+\/\w+\//gi).map((tag) => tagToSemver(tag)!),
   ));
+  if (includeCanary) return lines;
+  return lines.filter((tag) => !tag.includes("canary"));
 }
 
 export async function getLatestVersion(
   $: Cash,
   remote: string,
+  versions?: string[],
 ): Promise<{ canary: boolean; version: string }> {
   const version = ((maxSatisfying(
-    await getVersions($, remote) as string[],
+    versions ?? (await getVersions($, remote) as string[]),
     ">= 0",
     svopts,
   )) as string ||

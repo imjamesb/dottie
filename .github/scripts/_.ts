@@ -4,6 +4,7 @@ import { exists } from "https://deno.land/std@0.99.0/fs/exists.ts";
 import $ from "https://deno.land/x/cash@0.1.0-alpha.14/mod.ts";
 import {
   getLatestVersion,
+  getVersions,
   hasTags,
   saveVersion,
   upgradeVersion,
@@ -65,6 +66,35 @@ if (newVersion.version !== latest.version) {
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
   await saveVersion($, newVersion.version, true, "./version.ts");
+
+  // Generate install map.
+  const versionsWithCanaries = await getVersions($, remote);
+  const versions = await getVersions($, remote, false, versionsWithCanaries);
+  const latestVersionWithCanary = await getLatestVersion(
+    $,
+    remote,
+    versionsWithCanaries,
+  );
+  const latestVersion = await getLatestVersion($, remote, versions);
+  const currentBranch = (await $`git rev-parse --abbrev-ref HEAD`.stdout())
+    .trim();
+  await $`git branch -d install-map || true`;
+  await $`git checkout --orphan install-map`;
+  await Deno.writeTextFile("latest.txt", latestVersion.version);
+  await Deno.writeTextFile(
+    "latest-canary.txt",
+    latestVersionWithCanary.version,
+  );
+  await Deno.writeTextFile("history.txt", versions.join("\n"));
+  await Deno.writeTextFile(
+    "history-canary.txt",
+    versionsWithCanaries.join("\n"),
+  );
+  await $`git add latest.txt latest-canary.txt history.txt history-canary.txt`;
+  await $`git commit -m "Initialized install map."`;
+  await $`git push -fu origin install-map`;
+  await $`git checkout ${currentBranch}`;
+
   if (await exists(".git/hooks-tmp")) {
     Deno.rename(".git/hooks-tmp", ".git/hooks");
   }
