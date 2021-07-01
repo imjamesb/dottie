@@ -78,10 +78,13 @@ if (newVersion.version !== latest.version) {
   const latestVersion = await getLatestVersion($, remote, versions);
   const currentBranch = (await $`git rev-parse --abbrev-ref HEAD`.stdout())
     .trim();
-  await $`git fetch -f||true && git pull -f||true`;
-  await $`git branch -d install-map || true`;
+  await $`mkdir -p .install-map`;
+  $.cwd = $.cwd + "/.install-map";
+  await $`git init`;
+  await $`git remote set-url origin ${remote}`;
+  await $`git config --global user.email "${user}@users.noreply.github.com"`;
+  await $`git config --global user.name "${user}"`;
   await $`git checkout --orphan install-map`;
-  await $`rm -rf * && mv .git git && rm -rf .* && mv git .git`;
   await Deno.writeTextFile("latest.txt", latestVersion.version);
   await Deno.writeTextFile(
     "latest-canary.txt",
