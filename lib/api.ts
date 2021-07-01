@@ -51,7 +51,6 @@ export async function initialize(dir: string, options?: Partial<DotInitOpts>) {
       "!/.gitignore",
       "!/README.md",
       "!/_",
-      "!/current",
       "!/passwordHash",
       "!/profiles/",
       "!/profiles/*/",
