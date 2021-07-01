@@ -61,13 +61,13 @@ export function semverToTag(version: string): string {
   version = version.trim();
   if (_semverToTag1.test(version)) {
     version = valid(version, svopts)!;
-    if (!version) throw new Error("Invalid semver version " + version);
+    if (!version) throw new Error("Invalid semver version: " + version);
     return version;
   }
   console.log("Did not pass 1");
   if (_semverToTag2.test(version)) {
     const v = valid(version.substring(0, version.indexOf("-")), svopts);
-    if (!v) throw new Error("Invalid semver version " + version);
+    if (!v) throw new Error("Invalid semver version: " + version);
     return "canary/" + v + "/" +
       version.substring(version.lastIndexOf(".") + 1);
   }
@@ -124,6 +124,7 @@ async function saveVersionToGit($: Cash, version: string, isSemver = true) {
   await $`git add version.ts`;
   await $`git commit -m "Updated version!"`;
   await $`git tag "${version}"`;
+  await $`git push -u origin "${version}"`;
 }
 
 export async function saveVersion(
@@ -135,8 +136,6 @@ export async function saveVersion(
   version = version.trim();
   await saveVersionToFile(version, isSemver, path);
   await saveVersionToGit($, version, isSemver);
-  if (isSemver) version = semverToTag(version);
-  await $`git push -u origin "${version}"`;
 }
 
 export async function generateBinaries(

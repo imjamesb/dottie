@@ -62,7 +62,10 @@ if (newVersion.version !== latest.version) {
   if (await exists(".git/hooks")) {
     Deno.rename(".git/hooks", ".git/hooks-tmp");
   }
-  await generateBinaries($);
+  await generateBinaries($, [[
+    "x86_64-apple-darwin",
+    "dot-x86_64-apple-darwin",
+  ]]);
   await $`git remote set-url origin ${remote}`;
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
