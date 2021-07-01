@@ -81,6 +81,7 @@ if (newVersion.version !== latest.version) {
   await $`git fetch -f||true && git pull -f||true`;
   await $`git branch -d install-map || true`;
   await $`git checkout --orphan install-map`;
+  await $`rm -rf * && mv .git git && rm -rf .* && mv git .git`;
   await Deno.writeTextFile("latest.txt", latestVersion.version);
   await Deno.writeTextFile(
     "latest-canary.txt",
