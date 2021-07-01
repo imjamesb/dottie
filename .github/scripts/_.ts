@@ -6,7 +6,7 @@ import {
   getLatestVersion,
   getVersions,
   hasTags,
-  //saveVersion,
+  saveVersion,
   upgradeVersion,
 } from "../util/util.ts";
 
@@ -65,7 +65,7 @@ if (newVersion.version !== latest.version) {
   await $`git remote set-url origin ${remote}`;
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
-  //await saveVersion($, newVersion.version, true, "./version.ts");
+  await saveVersion($, newVersion.version, true, "./version.ts");
 
   // Generate install map.
   const versionsWithCanaries = await getVersions($, remote);
