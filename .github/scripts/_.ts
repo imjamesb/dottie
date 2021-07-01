@@ -90,7 +90,8 @@ if (newVersion.version !== latest.version) {
     "history-canary.txt",
     versionsWithCanaries.join("\n"),
   );
-  await $`git add latest.txt latest-canary.txt history.txt history-canary.txt`;
+  await $
+    `git add -f latest.txt latest-canary.txt history.txt history-canary.txt`;
   await $`git commit -m "Initialized install map."`;
   await $`git push -fu origin install-map`;
   await $`git checkout ${currentBranch}`;
