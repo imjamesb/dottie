@@ -3,7 +3,6 @@
 import { exists } from "https://deno.land/std@0.99.0/fs/exists.ts";
 import $ from "https://deno.land/x/cash@0.1.0-alpha.14/mod.ts";
 import {
-  generateBinaries,
   getLatestVersion,
   hasTags,
   saveVersion,
