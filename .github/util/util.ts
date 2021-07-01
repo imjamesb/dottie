@@ -15,7 +15,6 @@ const svopts = {
 
 export function tagToSemver(tags: string): string | null {
   const parts: string[] = tags.split("/");
-  console.log(parts);
   if (parts.length == 3) {
     if (!(parts[1] = valid(parts[1])!)) {
       throw new Error("Invalid semver version!");
@@ -58,21 +57,18 @@ const _semverToTag1 = /^\d+\.\d+\.\d+$/g;
 const _semverToTag2 = /^\d+\.\d+\.\d+\-canary\.\d+$/g;
 
 export function semverToTag(version: string): string {
-  console.log(version);
   version = version.trim();
   if (_semverToTag1.test(version)) {
     version = valid(version, svopts)!;
     if (!version) throw new Error("Invalid semver version: " + version);
     return version;
   }
-  console.log("Did not pass 1");
   if (_semverToTag2.test(version)) {
     const v = valid(version.substring(0, version.indexOf("-")), svopts);
     if (!v) throw new Error("Invalid semver version: " + version);
     return "canary/" + v + "/" +
       version.substring(version.lastIndexOf(".") + 1);
   }
-  console.log("Did not pass 2");
   throw new Error("Invalid semver version: " + version);
 }
 
@@ -136,6 +132,7 @@ export async function saveVersion(
 ) {
   version = version.trim();
   await saveVersionToFile(version, isSemver, path);
+  await generateBinaries($);
   await saveVersionToGit($, version, isSemver);
 }
 
