@@ -14,6 +14,7 @@
 !/tests/**/*.ts
 !/.gitignore
 !/cli.ts
+!/install.sh
 !/mod.ts
 !/README.md
 !/version.ts
