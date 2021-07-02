@@ -89,7 +89,7 @@ function downloadUrlForVersion () {
 
 HELP="$(cat << EOF
 
-  ${BOLD}Usage${NO_BOLD}: ${BLUE}sh -c "\$(curl ${repo_raw}/main/install.sh)" -- ${YELLOW}[${PURPLE}versionOrCommand${YELLOW}]${FGD}
+  ${BOLD}Usage${NO_BOLD}: ${BLUE}sh -c "\$(curl -s ${repo_raw}/main/install.sh)" -- ${YELLOW}[${PURPLE}versionOrCommand${YELLOW}]${FGD}
 
   ${BOLD}Description${NO_BOLD}:
 
