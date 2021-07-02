@@ -2,6 +2,7 @@
 import { Command } from "../deps.ts";
 import version from "../../version.ts";
 import init from "./init.ts";
+import upgrade from "./upgrade.ts";
 
 export type DotOpts = {
   verbose: number;
@@ -48,5 +49,6 @@ function addCmd(cmd: Command) {
 }
 
 addCmd(init);
+addCmd(upgrade);
 
 export default _;
