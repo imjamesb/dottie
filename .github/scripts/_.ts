@@ -113,7 +113,7 @@ if (newVersion.version !== latest.version) {
   );
   await $`git add .`;
   await $`ls -la`;
-  await $`git commit -m "Initialized install map."`;
+  await $`git commit -m "Initialized install map (tagged)."`;
   await $`git push -fu origin install-map`;
 
   if (await exists(".git/hooks-tmp")) {
