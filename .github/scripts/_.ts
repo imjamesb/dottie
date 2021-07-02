@@ -7,6 +7,7 @@ import {
   getVersions,
   hasTags,
   saveVersion,
+  semverToTag,
   upgradeVersion,
 } from "../util/util.ts";
 
@@ -70,12 +71,16 @@ if (newVersion.version !== latest.version) {
   // Generate install map.
   const versionsWithCanaries = await getVersions($, remote);
   const versions = await getVersions($, remote, false, versionsWithCanaries);
-  const latestVersionWithCanary = await getLatestVersion(
-    $,
-    remote,
-    versionsWithCanaries,
+  const latestVersionWithCanary = semverToTag(
+    (await getLatestVersion(
+      $,
+      remote,
+      versionsWithCanaries,
+    )).version,
   );
-  const latestVersion = await getLatestVersion($, remote, versions);
+  const latestVersion = semverToTag(
+    (await getLatestVersion($, remote, versions)).version,
+  );
   await $`mkdir -p .install-map`;
   $.cwd = $.cwd + "/.install-map";
   await $`git init`;
@@ -83,15 +88,18 @@ if (newVersion.version !== latest.version) {
   await $`git config --global user.email "${user}@users.noreply.github.com"`;
   await $`git config --global user.name "${user}"`;
   await $`git checkout --orphan install-map`;
-  await Deno.writeTextFile(".install-map/latest.txt", latestVersion.version);
+  await Deno.writeTextFile(".install-map/latest.txt", latestVersion);
   await Deno.writeTextFile(
     ".install-map/latest-canary.txt",
-    latestVersionWithCanary.version,
+    latestVersionWithCanary,
   );
-  await Deno.writeTextFile(".install-map/history.txt", versions.join("\n"));
+  await Deno.writeTextFile(
+    ".install-map/history.txt",
+    versions.map(semverToTag).join("\n"),
+  );
   await Deno.writeTextFile(
     ".install-map/history-canary.txt",
-    versionsWithCanaries.join("\n"),
+    versionsWithCanaries.map(semverToTag).join("\n"),
   );
   await Deno.writeTextFile(
     ".install-map/.gitignore",
