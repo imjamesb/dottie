@@ -66,18 +66,13 @@ const _semverToTag2 = /^\d+\.\d+\.\d+\-canary\.\d+$/g;
 
 export function semverToTag(version: string): string {
   version = version.trim();
-  if (_semverToTag1.test(version)) {
-    version = valid(version, svopts)!;
-    if (!version) throw new Error("Invalid semver version: " + version);
-    return version;
-  }
-  if (_semverToTag2.test(version)) {
-    const v = valid(version.substring(0, version.indexOf("-")), svopts);
-    if (!v) throw new Error("Invalid semver version: " + version);
-    return "canary/" + v + "/" +
-      version.substring(version.lastIndexOf(".") + 1);
-  }
-  throw new Error("Invalid semver version: " + version);
+  const [_, major, minor, patch, , suffix, , pre] = [
+    ...(version.match(/^(\d+)\.(\d+)\.(\d+)(\-(\w+)(\.(\d+))?)?$/)) || [],
+  ];
+  if (!_) throw new Error("Invalid semver version: " + version);
+  return `${
+    suffix !== undefined ? suffix + "/" : ""
+  }${major}.${minor}.${patch}${pre !== undefined ? "/" + pre : ""}`;
 }
 
 export function semverSort(tags: string[]): string[] {
