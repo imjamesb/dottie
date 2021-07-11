@@ -41,7 +41,7 @@ export async function getVersions(
   lines ??= semverSort(filterTagsToVersions(
     (await $`git ls-remote -q --tags ${remote}`
       .stdout()).trim().replace(/\^\{\}/gi, "").substring(58)
-      .split(/\r*\n+\w+\t\w+\/\w+\//gi).map((tag) => tagToSemver(tag)!),
+      .split(/\r*\n+\w+\t\w+\/\w+\//gi).map((tag: string) => tagToSemver(tag)!),
   ));
   if (includeCanary) return lines;
   return lines.filter((tag) => !tag.includes("canary"));
