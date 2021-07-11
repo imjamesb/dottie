@@ -183,6 +183,7 @@ export default new Command<UpgradeOpts, UpgradeArgs, DotOpts>()
   })
   .env("DOT_INSTALL", "The installation directory of where to install dottie.")
   .action(async (opts) => {
+    // deno-lint-ignore prefer-const
     let version!: string;
     let tag: string = opts.version!;
     if (tag === undefined) {
