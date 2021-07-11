@@ -1,6 +1,6 @@
 // Imports
 import type { DotOpts } from "./mod.ts";
-import { basename, dirname } from "https://deno.land/std@0.100.0/path/mod.ts";
+import { dirname } from "https://deno.land/std@0.100.0/path/mod.ts";
 import { exists } from "https://deno.land/std@0.100.0/fs/exists.ts";
 import { valid } from "https://deno.land/x/semver@v1.4.0/mod.ts";
 import { Cash } from "https://deno.land/x/cash@0.1.0-alpha.13/mod.ts";
@@ -67,7 +67,7 @@ async function getLatestVersion(canary = false): Promise<string> {
   return (await (await fetch(versionLatest(canary))).text()).trim();
 }
 
-const mode = 33279;
+const _mode = 33279;
 
 const encoder = new TextEncoder();
 
@@ -105,7 +105,7 @@ function formatSize(
 async function download(
   from: string,
   to: string,
-  version: string,
+  _version: string,
 ): Promise<void> {
   const response = await fetch(from);
   if (!response.ok) throw new Error("Request returned a non-ok status code.");
